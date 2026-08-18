@@ -197,22 +197,22 @@ function getCarrierInfo(callsign = "") {
     },
     BAW: {
       name: "BRITISH AIRWAYS",
-      logo: "/logos/british-airways.jpg",
+      logo: "/logos/british.jpg",
     },
 
     THY: {
       name: "TURKISH",
-      logo: "/logos/turkish-airlines.jpg",
+      logo: "/logos/turkish.jpg",
     },
 
     AFR: {
       name: "AIR FRANCE",
-      logo: "/logos/air-france.jpg",
+      logo: "/logos/airfrance.jpg",
     },
 
     SIA: {
       name: "SINGAPORE",
-      logo: "/logos/singapore-airlines.jpg",
+      logo: "/logos/singapore.jpg",
     },
 
     DLH: {

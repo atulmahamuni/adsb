@@ -54,6 +54,61 @@ function validateLatLon(lat, lon) {
 
 
 // ------------------------------------------------------------
+// Geocode postal address to latitude / longitude
+// ------------------------------------------------------------
+
+async function geocodeAddress(addressText) {
+  const rawAddress =
+    typeof addressText === "string"
+      ? addressText.trim()
+      : "";
+
+  if (!rawAddress) {
+    throw new Error("Address text is required");
+  }
+
+  const encodedAddress =
+    encodeURIComponent(rawAddress);
+
+  const url =
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodedAddress}`;
+
+  const response = await fetch(url, {
+    headers: {
+      "Accept-Language": "en",
+      "User-Agent": "adsb1-server/1.0",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Geocoding failed: HTTP ${response.status} ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  const result = Array.isArray(data) ? data[0] : null;
+
+  if (!result) {
+    throw new Error("No GPS coordinates found for that address");
+  }
+
+  const lat = Number(result.lat);
+  const lon = Number(result.lon);
+
+  if (!validateLatLon(lat, lon)) {
+    throw new Error("Address resolved to invalid GPS coordinates");
+  }
+
+  return {
+    lat,
+    lon,
+    displayName: result.display_name || rawAddress,
+  };
+}
+
+
+// ------------------------------------------------------------
 // Get nearby aircraft from ADSB.lol
 // ------------------------------------------------------------
 
@@ -372,6 +427,70 @@ app.post("/api/location", async (req, res) => {
     lastUpdated,
 
   });
+
+});
+
+
+// ------------------------------------------------------------
+// Set current location from a postal address
+// ------------------------------------------------------------
+
+app.post("/api/location/address", async (req, res) => {
+
+  const address =
+    req.body.address ??
+    req.body.postalAddress ??
+    req.body.text;
+
+  if (!address || !String(address).trim()) {
+    return res.status(400).json({
+      error: "Address text is required",
+      example: {
+        address: "1600 Amphitheatre Parkway, Mountain View, CA",
+      },
+    });
+  }
+
+  try {
+    const geocodedLocation =
+      await geocodeAddress(address);
+
+    currentLocation = {
+      lat: geocodedLocation.lat,
+      lon: geocodedLocation.lon,
+    };
+
+    console.log(
+      `Location changed via address to ${geocodedLocation.lat}, ${geocodedLocation.lon} for "${address}"`
+    );
+
+    await refreshAircraft();
+
+    return res.json({
+      success: true,
+      address,
+      geocoded: {
+        displayName: geocodedLocation.displayName,
+        lat: geocodedLocation.lat,
+        lon: geocodedLocation.lon,
+      },
+      location: currentLocation,
+      aircraftCount: aircraft.length,
+      lastUpdated,
+    });
+
+  } catch (error) {
+    console.error(
+      "Address geocoding failed:",
+      error.message
+    );
+
+    return res.status(400).json({
+      error: "Unable to resolve the supplied address to GPS coordinates",
+      details: error.message,
+      received: String(address),
+    });
+  }
 
 });
 

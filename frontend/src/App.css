@@ -1,0 +1,353 @@
+html,
+body,
+#root {
+  margin: 0;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 100%;
+  min-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow: auto;
+
+  background: #242424;
+
+  font-family:
+    "Courier New",
+    monospace;
+}
+
+
+/* ============================================================
+   MAC / DEVELOPMENT PREVIEW
+
+   This centers a Raspberry Pi sized screen in the browser.
+
+   Target display:
+      1024 x 600
+   ============================================================ */
+
+.preview {
+  width: 100vw;
+  height: 100vh;
+
+  min-width: 1024px;
+  min-height: 600px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #242424;
+}
+
+
+/* ============================================================
+   ACTUAL DISPLAY AREA
+
+   This represents the physical Raspberry Pi screen.
+   ============================================================ */
+
+.screen {
+  position: relative;
+
+  width: 1024px;
+  height: 600px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #111 0%,
+      #050505 60%,
+      #000 100%
+    );
+
+  color: #eafcff;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  box-shadow:
+    0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
+.content {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+
+  padding:
+    38px
+    50px
+    34px
+    50px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  text-shadow:
+    0 0 3px currentColor,
+    0 0 7px currentColor,
+    0 0 14px rgba(190, 240, 255, 0.65);
+}
+
+
+/* ============================================================
+   TOP SECTION
+   ============================================================ */
+
+.top-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 45px;
+
+  width: 100%;
+}
+
+
+/* ============================================================
+   AIRLINE / AIRCRAFT IMAGE
+   ============================================================ */
+
+.logo-panel {
+  width: 240px;
+  height: 240px;
+
+  flex: 0 0 240px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  border:
+    2px solid
+    rgba(150, 230, 255, 0.18);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(70, 150, 255, 0.16),
+      rgba(10, 80, 170, 0.08) 55%,
+      rgba(0, 0, 0, 0) 80%
+    );
+
+  box-shadow:
+    inset 0 0 18px
+      rgba(120, 210, 255, 0.10),
+
+    0 0 16px
+      rgba(80, 180, 255, 0.08);
+}
+
+
+.carrier-logo {
+  width: 90%;
+  height: 90%;
+
+  object-fit: contain;
+
+  /*
+    Important:
+    DO NOT grayscale airline logos.
+  */
+
+  filter:
+    saturate(1.15)
+    contrast(1.03)
+    brightness(1.04)
+    drop-shadow(
+      0 0 6px
+      rgba(160, 235, 255, 0.35)
+    );
+}
+
+
+/* ============================================================
+   AIRCRAFT IDENTITY
+   ============================================================ */
+
+.identity {
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.callsign {
+  font-size: 76px;
+
+  font-weight: 700;
+
+  line-height: 0.95;
+
+  letter-spacing: 4px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.carrier-name {
+  margin-top: 12px;
+
+  font-size: 28px;
+
+  line-height: 1;
+
+  letter-spacing: 7px;
+
+  color: #bfefff;
+}
+
+
+.route {
+  margin-top: 24px;
+
+  font-size: 64px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: 5px;
+
+  white-space: nowrap;
+}
+
+
+.type {
+  margin-top: 22px;
+
+  font-size: 32px;
+
+  line-height: 1;
+
+  letter-spacing: 2px;
+
+  color: #ccefff;
+}
+
+
+/* ============================================================
+   BOTTOM STATS
+   ============================================================ */
+
+.stats {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+
+  padding-top: 24px;
+
+  border-top:
+    1px solid
+    rgba(180, 235, 255, 0.12);
+
+  font-size: 31px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: 1px;
+
+  color: #dffaff;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   DOT MATRIX EFFECT
+   ============================================================ */
+
+.matrix-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(0, 0, 0, 0.68) 1.8px,
+      rgba(255, 255, 255, 0.02) 2.1px,
+      transparent 2.5px
+    );
+
+  background-size:
+    7px
+    7px;
+
+  mix-blend-mode: multiply;
+}
+
+
+/* ============================================================
+   SCANNING SCREEN
+   ============================================================ */
+
+.loading {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+
+  font-size: 68px;
+
+  font-weight: 700;
+
+  letter-spacing: 8px;
+
+  color: #dffaff;
+
+  text-shadow:
+    0 0 4px #dffaff,
+    0 0 12px #77d5ff;
+}

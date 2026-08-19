@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+const locationPresets = [
+  { id: "ksea", label: "KSEA", city: "Seattle", lat: 47.4502, lon: -122.3088 },
+  { id: "ksfo", label: "KSFO", city: "San Francisco", lat: 37.6216, lon: -122.3818 },
+  { id: "kjfk", label: "KJFK", city: "New York", lat: 40.6413, lon: -73.7781 },
+  { id: "kord", label: "KORD", city: "Chicago", lat: 41.9742, lon: -87.9073 },
+  { id: "kden", label: "KDEN", city: "Denver", lat: 39.8561, lon: -104.6737 },
+  { id: "kphx", label: "KPHX", city: "Phoenix", lat: 33.4351, lon: -112.0101 },
+  { id: "home", label: "Home", city: "Sammamish", address: "251st Pl SE, Sammamish, WA" },
+];
+
 export default function App() {
   const [aircraft, setAircraft] = useState([]);
   const [metar, setMetar] = useState(null);
   const [index, setIndex] = useState(0);
+  const [screen, setScreen] = useState("main");
+  const [isChangingLocation, setIsChangingLocation] = useState(false);
+  const [selectedLocationId, setSelectedLocationId] = useState("ksea");
 
   async function loadAircraft() {
     try {
@@ -13,8 +26,58 @@ export default function App() {
 
       setAircraft(data.aircraft || []);
       setMetar(data.metar || null);
+
+      if (data.location) {
+        const locationMatch = locationPresets.find((option) => {
+          if (option.address) {
+            return data.location.lat === undefined || data.location.lon === undefined
+              ? false
+              : false;
+          }
+
+          return (
+            Math.abs((data.location.lat ?? 0) - (option.lat ?? 0)) < 0.0001 &&
+            Math.abs((data.location.lon ?? 0) - (option.lon ?? 0)) < 0.0001
+          );
+        });
+
+        if (locationMatch) {
+          setSelectedLocationId(locationMatch.id);
+        }
+      }
     } catch (err) {
       console.error("Failed to load aircraft:", err);
+    }
+  }
+
+  async function applyLocationSelection(option) {
+    try {
+      setIsChangingLocation(true);
+
+      const payload = option.address
+        ? { address: option.address }
+        : { lat: option.lat, lon: option.lon };
+
+      const endpoint = option.address ? "/api/location/address" : "/api/location";
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update location");
+      }
+
+      setSelectedLocationId(option.id);
+      await loadAircraft();
+      setScreen("main");
+    } catch (err) {
+      console.error("Location update failed:", err);
+    } finally {
+      setIsChangingLocation(false);
     }
   }
 
@@ -38,11 +101,67 @@ export default function App() {
     return () => clearInterval(rotateTimer);
   }, [aircraft]);
 
+  if (screen === "locations") {
+    return (
+      <div className="preview">
+        <div className="screen">
+          <div className="matrix-overlay" />
+
+          <div className="location-screen">
+            <div className="location-header">
+              <button
+                className="nav-button"
+                onClick={() => setScreen("main")}
+                type="button"
+              >
+                ← Main
+              </button>
+
+              <div className="location-title">Locations</div>
+            </div>
+
+            <div className="location-grid">
+              {locationPresets.map((option) => {
+                const isCurrent = selectedLocationId === option.id;
+
+                return (
+                  <button
+                    key={option.id}
+                    className={`location-card${isCurrent ? " is-current" : ""}`}
+                    type="button"
+                    disabled={isChangingLocation}
+                    onClick={() => applyLocationSelection(option)}
+                  >
+                    <div className="location-card-top">
+                      <div className="location-icon">{option.address ? "⌂" : "✈"}</div>
+                      {isCurrent && <span className="location-current-indicator">●</span>}
+                    </div>
+                    <div className="location-name">{option.label}</div>
+                    <div className="location-city">{option.city}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (aircraft.length === 0) {
     return (
       <div className="preview">
         <div className="screen">
           <div className="matrix-overlay" />
+
+          <button
+            className="gear-button"
+            type="button"
+            aria-label="Open location list"
+            onClick={() => setScreen("locations")}
+          >
+            ⚙
+          </button>
 
           <div className="loading">
             SCANNING...
@@ -63,6 +182,15 @@ export default function App() {
     <div className="preview">
       <div className="screen">
         <div className="matrix-overlay" />
+
+        <button
+          className="gear-button"
+          type="button"
+          aria-label="Open location list"
+          onClick={() => setScreen("locations")}
+        >
+          ⚙
+        </button>
 
         <div className="content">
 

@@ -3,6 +3,7 @@ import "./App.css";
 
 export default function App() {
   const [aircraft, setAircraft] = useState([]);
+  const [metar, setMetar] = useState(null);
   const [index, setIndex] = useState(0);
 
   async function loadAircraft() {
@@ -11,6 +12,7 @@ export default function App() {
       const data = await res.json();
 
       setAircraft(data.aircraft || []);
+      setMetar(data.metar || null);
     } catch (err) {
       console.error("Failed to load aircraft:", err);
     }
@@ -53,6 +55,9 @@ export default function App() {
   const ac = aircraft[index % aircraft.length];
 
   const carrier = getCarrierInfo(ac.callsign);
+  const metarText = metar && metar.rawText
+    ? metar.rawText
+    : "METAR UNAVAILABLE";
 
   return (
     <div className="preview">
@@ -92,6 +97,16 @@ export default function App() {
             </div>
 
           </div>
+
+          {metar && (
+            <div className="metar-strip" aria-live="polite">
+              <div className="metar-track">
+                <span>{metarText}</span>
+                <span>{metarText}</span>
+                <span>{metarText}</span>
+              </div>
+            </div>
+          )}
 
           <div className="stats">
 

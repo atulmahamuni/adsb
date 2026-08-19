@@ -108,9 +108,9 @@ body {
   justify-content: space-between;
 
   text-shadow:
+    0 0 1px currentColor,
     0 0 3px currentColor,
-    0 0 7px currentColor,
-    0 0 14px rgba(190, 240, 255, 0.65);
+    0 0 8px rgba(190, 240, 255, 0.35);
 }
 
 
@@ -261,6 +261,61 @@ body {
 
 
 /* ============================================================
+   METAR TICKER
+   ============================================================ */
+
+.metar-strip {
+  width: 100%;
+
+  overflow: hidden;
+
+  padding:
+    8px 0
+    10px;
+
+  border-top:
+    1px solid
+    rgba(180, 235, 255, 0.12);
+
+  border-bottom:
+    1px solid
+    rgba(180, 235, 255, 0.12);
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  letter-spacing: 0.5px;
+
+  color: #dffaff;
+}
+
+.metar-track {
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+  animation: metar-scroll 28s linear infinite;
+}
+
+.metar-track span {
+  display: inline-block;
+  padding-right: 28px;
+}
+
+@keyframes metar-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* ============================================================
    BOTTOM STATS
    ============================================================ */
 
@@ -310,16 +365,17 @@ body {
   background-image:
     radial-gradient(
       circle,
-      rgba(0, 0, 0, 0.68) 1.8px,
-      rgba(255, 255, 255, 0.02) 2.1px,
-      transparent 2.5px
+      rgba(0, 0, 0, 0.68) 1.2px,
+      rgba(255, 255, 255, 0.025) 1.5px,
+      transparent 2.1px
     );
 
   background-size:
-    7px
-    7px;
+    9px
+    9px;
 
   mix-blend-mode: multiply;
+  opacity: 0.8;
 }
 
 

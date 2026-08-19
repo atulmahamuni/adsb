@@ -28,6 +28,7 @@ let currentLocation = {
 };
 
 let aircraft = [];
+let currentMetar = null;
 let lastUpdated = null;
 
 
@@ -50,6 +51,28 @@ function validateLatLon(lat, lon) {
   }
 
   return true;
+}
+
+
+function toRadians(value) {
+  return (value * Math.PI) / 180;
+}
+
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const earthRadiusKm = 6371;
+
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadiusKm * c;
 }
 
 
@@ -105,6 +128,89 @@ async function geocodeAddress(addressText) {
     lon,
     displayName: result.display_name || rawAddress,
   };
+}
+
+
+// ------------------------------------------------------------
+// Get the nearest airport weather station for this location
+// ------------------------------------------------------------
+
+async function getNearestWeatherStation(lat, lon) {
+  const pointsUrl =
+    `https://api.weather.gov/points/${lat},${lon}`;
+
+  const pointsResponse = await fetch(pointsUrl);
+
+  if (!pointsResponse.ok) {
+    throw new Error(
+      `Weather.gov points lookup failed: HTTP ${pointsResponse.status} ${pointsResponse.statusText}`
+    );
+  }
+
+  const pointsData = await pointsResponse.json();
+  const stationUrl =
+    pointsData?.properties?.observationStations;
+
+  if (!stationUrl) {
+    throw new Error("No observation stations found for this location");
+  }
+
+  const stationsResponse = await fetch(stationUrl);
+
+  if (!stationsResponse.ok) {
+    throw new Error(
+      `Weather.gov station lookup failed: HTTP ${stationsResponse.status} ${stationsResponse.statusText}`
+    );
+  }
+
+  const stationsData = await stationsResponse.json();
+  const stationFeatures = Array.isArray(stationsData?.features)
+    ? stationsData.features
+    : [];
+
+  if (stationFeatures.length === 0) {
+    throw new Error("No nearby weather stations available");
+  }
+
+  const nearestStation = stationFeatures
+    .map((feature) => {
+      const props = feature?.properties || {};
+      const stationId =
+        props.stationIdentifier ||
+        (feature?.id ? feature.id.split("/").pop() : null);
+
+      const stationLat =
+        Array.isArray(feature?.geometry?.coordinates) && feature.geometry.coordinates.length >= 2
+          ? Number(feature.geometry.coordinates[1])
+          : null;
+
+      const stationLon =
+        Array.isArray(feature?.geometry?.coordinates) && feature.geometry.coordinates.length >= 2
+          ? Number(feature.geometry.coordinates[0])
+          : null;
+
+      const distanceKm =
+        props.distance && typeof props.distance.value === "number"
+          ? Number(props.distance.value) / 1000
+          : (
+              stationLat !== null && stationLon !== null
+                ? haversineKm(lat, lon, stationLat, stationLon)
+                : Number.POSITIVE_INFINITY
+            );
+
+      return {
+        stationId,
+        distanceKm,
+      };
+    })
+    .filter((station) => station.stationId)
+    .sort((a, b) => a.distanceKm - b.distanceKm)[0];
+
+  if (!nearestStation) {
+    throw new Error("Unable to determine nearest weather station");
+  }
+
+  return nearestStation.stationId;
 }
 
 
@@ -188,6 +294,60 @@ function airportCode(airport) {
 
 
 // ------------------------------------------------------------
+// Refresh METAR for the nearest airfield
+// ------------------------------------------------------------
+
+async function refreshMetar() {
+  const { lat, lon } = currentLocation;
+
+  try {
+    const stationId = await getNearestWeatherStation(lat, lon);
+    const metarUrl =
+      `https://aviationweather.gov/api/data/metar?ids=${encodeURIComponent(stationId)}&format=json`;
+
+    const metarResponse = await fetch(metarUrl);
+
+    if (!metarResponse.ok) {
+      throw new Error(
+        `METAR lookup failed: HTTP ${metarResponse.status} ${metarResponse.statusText}`
+      );
+    }
+
+    const metarData = await metarResponse.json();
+    const report = Array.isArray(metarData) ? metarData[0] : null;
+
+    const rawText =
+      report?.rawOb ||
+      report?.rawText ||
+      "METAR unavailable";
+
+    const normalizedMetar =
+      String(rawText).trim();
+
+    currentMetar = {
+      stationId,
+      stationName: report?.name || stationId,
+      rawText: normalizedMetar,
+      timestamp: report?.reportTime || report?.obsTime || null,
+      textDescription: report?.wxString || null,
+    };
+
+    console.log(
+      `Updated METAR for ${stationId}: ${normalizedMetar}`
+    );
+
+  } catch (error) {
+    console.error(
+      "METAR refresh failed:",
+      error.message
+    );
+
+    currentMetar = null;
+  }
+}
+
+
+// ------------------------------------------------------------
 // Refresh aircraft
 // ------------------------------------------------------------
 
@@ -267,6 +427,8 @@ async function refreshAircraft() {
 
   aircraft = results;
 
+  await refreshMetar();
+
   lastUpdated = new Date();
 
   console.log(
@@ -294,8 +456,24 @@ app.get("/api/aircraft", (req, res) => {
 
     lastUpdated,
 
+    metar: currentMetar,
+
     aircraft,
 
+  });
+
+});
+
+
+// ------------------------------------------------------------
+// Get nearest airport METAR
+// ------------------------------------------------------------
+
+app.get("/api/metar", (req, res) => {
+
+  res.json({
+    location: currentLocation,
+    metar: currentMetar,
   });
 
 });

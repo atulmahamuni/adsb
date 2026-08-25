@@ -778,6 +778,32 @@ app.post("/api/radius", async (req, res) => {
 });
 
 
+// ------------------------------------------------------------
+// Stop local kiosk session
+// ------------------------------------------------------------
+
+app.post("/api/shutdown", (req, res) => {
+
+  if (process.env.ALLOW_APP_SHUTDOWN !== "true") {
+    return res.status(403).json({
+      error: "Shutdown is not enabled for this server",
+    });
+  }
+
+  console.log("Shutdown requested from frontend");
+
+  res.json({
+    success: true,
+    message: "Stopping kiosk session",
+  });
+
+  setTimeout(() => {
+    process.exit(0);
+  }, 250);
+
+});
+
+
 // ============================================================
 // Start server
 // ============================================================

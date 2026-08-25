@@ -114,6 +114,16 @@ export default function App() {
     }
   }
 
+  async function stopKioskSession() {
+    try {
+      await fetch("/api/shutdown", {
+        method: "POST",
+      });
+    } catch (err) {
+      console.error("Shutdown request failed:", err);
+    }
+  }
+
   useEffect(() => {
     loadAircraft();
 
@@ -209,6 +219,14 @@ export default function App() {
                 );
               })}
             </div>
+
+            <button
+              className="shutdown-button"
+              type="button"
+              onClick={stopKioskSession}
+            >
+              Stop Session
+            </button>
           </div>
         </div>
       </div>

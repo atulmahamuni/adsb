@@ -4,6 +4,20 @@ set -euo pipefail
 APP_DIR="${APP_DIR:-/opt/adsb}"
 BACKEND_SERVICE="${BACKEND_SERVICE:-adsb-backend}"
 
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm is not installed."
+  echo ""
+  echo "Install Node.js/npm on Raspberry Pi OS or Debian with:"
+  echo "  curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh"
+  echo "  sudo -E bash nodesource_setup.sh"
+  echo "  sudo apt install -y nodejs"
+  echo ""
+  echo "Then verify with:"
+  echo "  node -v"
+  echo "  npm -v"
+  exit 1
+fi
+
 echo "Updating ADSB app in ${APP_DIR}"
 
 cd "${APP_DIR}"

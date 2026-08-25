@@ -31,15 +31,15 @@ body {
    This centers a Raspberry Pi sized screen in the browser.
 
    Target display:
-      1024 x 600
+      800 x 480
    ============================================================ */
 
 .preview {
   width: 100vw;
   height: 100vh;
 
-  min-width: 1024px;
-  min-height: 600px;
+  min-width: 800px;
+  min-height: 480px;
 
   display: flex;
   align-items: center;
@@ -58,8 +58,8 @@ body {
 .screen {
   position: relative;
 
-  width: 1024px;
-  height: 600px;
+  width: 800px;
+  height: 480px;
 
   flex-shrink: 0;
 
@@ -85,12 +85,12 @@ body {
 
 .gear-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 14px;
+  right: 14px;
   z-index: 10;
 
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 
   border: 1px solid rgba(180, 235, 255, 0.28);
   border-radius: 50%;
@@ -98,7 +98,7 @@ body {
   background: rgba(17, 24, 30, 0.55);
   color: #dffaff;
 
-  font-size: 28px;
+  font-size: 23px;
   line-height: 1;
 
   cursor: pointer;
@@ -125,10 +125,10 @@ body {
   height: 100%;
 
   padding:
-    38px
-    50px
-    34px
-    50px;
+    28px
+    36px
+    26px
+    36px;
 
   display: flex;
   flex-direction: column;
@@ -151,7 +151,7 @@ body {
 
   align-items: center;
 
-  gap: 45px;
+  gap: 34px;
 
   width: 100%;
 }
@@ -162,10 +162,10 @@ body {
    ============================================================ */
 
 .logo-panel {
-  width: 240px;
-  height: 240px;
+  width: 180px;
+  height: 180px;
 
-  flex: 0 0 240px;
+  flex: 0 0 180px;
 
   display: flex;
 
@@ -231,13 +231,13 @@ body {
 
 
 .callsign {
-  font-size: 76px;
+  font-size: 56px;
 
   font-weight: 700;
 
   line-height: 0.95;
 
-  letter-spacing: 4px;
+  letter-spacing: 3px;
 
   white-space: nowrap;
 
@@ -248,37 +248,37 @@ body {
 
 
 .carrier-name {
-  margin-top: 12px;
+  margin-top: 9px;
 
-  font-size: 28px;
+  font-size: 22px;
 
   line-height: 1;
 
-  letter-spacing: 7px;
+  letter-spacing: 5px;
 
   color: #bfefff;
 }
 
 
 .route {
-  margin-top: 24px;
+  margin-top: 18px;
 
-  font-size: 64px;
+  font-size: 48px;
 
   font-weight: 700;
 
   line-height: 1;
 
-  letter-spacing: 5px;
+  letter-spacing: 4px;
 
   white-space: nowrap;
 }
 
 
 .type {
-  margin-top: 22px;
+  margin-top: 16px;
 
-  font-size: 32px;
+  font-size: 24px;
 
   line-height: 1;
 
@@ -298,8 +298,8 @@ body {
   overflow: hidden;
 
   padding:
-    8px 0
-    10px;
+    7px 0
+    8px;
 
   border-top:
     1px solid
@@ -309,7 +309,7 @@ body {
     1px solid
     rgba(180, 235, 255, 0.12);
 
-  font-size: 18px;
+  font-size: 15px;
 
   font-weight: 700;
 
@@ -329,7 +329,7 @@ body {
 
 .metar-track span {
   display: inline-block;
-  padding-right: 28px;
+  padding-right: 22px;
 }
 
 @keyframes metar-scroll {
@@ -350,7 +350,7 @@ body {
   width: 100%;
   height: 100%;
 
-  padding: 28px 36px 24px;
+  padding: 20px 24px 18px;
 
   display: flex;
   flex-direction: column;
@@ -362,26 +362,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .nav-button {
   border: 1px solid rgba(180, 235, 255, 0.28);
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(17, 24, 30, 0.6);
   color: #dffaff;
-  padding: 10px 16px;
-  font-size: 18px;
+  padding: 8px 12px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .location-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: #dffaff;
 }
@@ -389,10 +389,10 @@ body {
 .radius-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 
-  padding: 16px 18px 14px;
-  margin-bottom: 18px;
+  padding: 12px 14px 10px;
+  margin-bottom: 12px;
 
   border: 1px solid rgba(180, 235, 255, 0.25);
   border-radius: 8px;
@@ -403,7 +403,7 @@ body {
 .location-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
   margin-top: 0;
 }
 
@@ -413,7 +413,7 @@ body {
   align-items: center;
   justify-content: center;
 
-  min-height: 104px;
+  min-height: 82px;
 
   border: 1px solid rgba(180, 235, 255, 0.2);
   border-radius: 8px;
@@ -449,11 +449,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .location-icon {
-  font-size: 26px;
+  font-size: 20px;
 }
 
 .location-current-indicator {
@@ -467,14 +467,14 @@ body {
 }
 
 .location-name {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 2px;
 }
 
 .location-city {
-  margin-top: 4px;
-  font-size: 14px;
+  margin-top: 3px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: #cfeffc;
 }
@@ -491,15 +491,15 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  gap: 20px;
+  gap: 14px;
 
-  padding-top: 24px;
+  padding-top: 18px;
 
   border-top:
     1px solid
     rgba(180, 235, 255, 0.12);
 
-  font-size: 40px;
+  font-size: 30px;
 
   font-weight: 700;
 
@@ -559,11 +559,11 @@ body {
 
   z-index: 2;
 
-  font-size: 68px;
+  font-size: 52px;
 
   font-weight: 700;
 
-  letter-spacing: 8px;
+  letter-spacing: 6px;
 
   color: #dffaff;
 
@@ -578,7 +578,7 @@ body {
    ============================================================ */
 
 .setting-label {
-  font-size: 24px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: 2px;
 
@@ -588,7 +588,7 @@ body {
 .radius-slider-wrap {
   position: relative;
 
-  height: 28px;
+  height: 24px;
 
   display: flex;
   align-items: center;
@@ -599,7 +599,7 @@ body {
   z-index: 2;
 
   width: 100%;
-  height: 28px;
+  height: 24px;
 
   cursor: pointer;
 
@@ -613,9 +613,9 @@ body {
   appearance: none;
   -webkit-appearance: none;
 
-  width: 24px;
-  height: 24px;
-  margin-top: -9px;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
 
   border-radius: 50%;
 
@@ -639,8 +639,8 @@ body {
 }
 
 .radius-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 
   border-radius: 50%;
 
@@ -703,8 +703,8 @@ body {
 
 .radius-ticks {
   position: absolute;
-  left: 12px;
-  right: 12px;
+  left: 10px;
+  right: 10px;
   top: 50%;
   z-index: 1;
 
@@ -718,7 +718,7 @@ body {
 
 .radius-ticks span {
   width: 2px;
-  height: 14px;
+  height: 12px;
 
   border-radius: 1px;
 
@@ -732,14 +732,14 @@ body {
   display: flex;
   justify-content: space-between;
 
-  font-size: 14px;
+  font-size: 12px;
   letter-spacing: 1px;
 
   color: #99d5f0;
 }
 
 .nav-button {
-  padding: 8px 16px;
+  padding: 7px 12px;
 
   border: 1px solid rgba(180, 235, 255, 0.3);
   border-radius: 6px;
@@ -748,7 +748,7 @@ body {
   color: #dffaff;
 
   font-family: "Courier New", monospace;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 1px;
 
@@ -769,9 +769,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 14px;
 
-  margin-bottom: 30px;
+  margin-bottom: 16px;
 
   width: 100%;
 }
@@ -780,9 +780,9 @@ body {
   flex: 1;
   text-align: center;
 
-  font-size: 42px;
+  font-size: 30px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
 
   color: #dffaff;
 

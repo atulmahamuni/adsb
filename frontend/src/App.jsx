@@ -401,6 +401,11 @@ function getCarrierInfo(callsign = "") {
       name: "AMERICAN",
       logo: "/logos/american.jpeg",
     },
+    ENY: {
+      name: "Envoy Air (American Eagle)",
+      logo: "/logos/american.jpeg",
+    },
+
     SKW: {
       name: "SKYWEST",
       logo: "/logos/skywest.webp",
@@ -448,6 +453,15 @@ function getCarrierInfo(callsign = "") {
     FFT: {
       name: "FRONTIER",
       logo: "/logos/frontier.png",
+    },
+
+    FDX: {
+      name: "FedEx",
+      logo: "/logos/fedex.jpg",
+    },
+    GJS: {
+      name: "GoJet",
+      logo: "/logos/gojet.webp",
     },
 
   };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const locationPresets = [
@@ -18,6 +18,9 @@ export default function App() {
   const [screen, setScreen] = useState("main");
   const [isChangingLocation, setIsChangingLocation] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState("ksea");
+  const [radiusNm, setRadiusNm] = useState(15);
+  const [isSavingRadius, setIsSavingRadius] = useState(false);
+  const savedRadiusRef = useRef(15);
 
   async function loadAircraft() {
     try {
@@ -26,6 +29,11 @@ export default function App() {
 
       setAircraft(data.aircraft || []);
       setMetar(data.metar || null);
+
+      if (data.radiusNm) {
+        setRadiusNm(data.radiusNm);
+        savedRadiusRef.current = data.radiusNm;
+      }
 
       if (data.location) {
         const locationMatch = locationPresets.find((option) => {
@@ -81,6 +89,31 @@ export default function App() {
     }
   }
 
+  async function saveRadiusChange(newRadius) {
+    if (newRadius === savedRadiusRef.current) {
+      return;
+    }
+
+    try {
+      setIsSavingRadius(true);
+      const res = await fetch("/api/radius", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ radiusNm: newRadius }),
+      });
+
+      if (res.ok) {
+        savedRadiusRef.current = newRadius;
+        setRadiusNm(newRadius);
+        await loadAircraft();
+      }
+    } catch (err) {
+      console.error("Radius update failed:", err);
+    } finally {
+      setIsSavingRadius(false);
+    }
+  }
+
   useEffect(() => {
     loadAircraft();
 
@@ -120,6 +153,40 @@ export default function App() {
               <div className="location-title">Locations</div>
             </div>
 
+            <div className="radius-panel">
+              <label className="setting-label" htmlFor="radius-slider">
+                Detection Radius: {radiusNm} NM
+              </label>
+
+              <div className="radius-slider-wrap">
+                <input
+                  id="radius-slider"
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="5"
+                  value={radiusNm}
+                  onChange={(e) => setRadiusNm(Number(e.target.value))}
+                  onPointerUp={(e) => saveRadiusChange(Number(e.currentTarget.value))}
+                  onKeyUp={(e) => saveRadiusChange(Number(e.currentTarget.value))}
+                  onBlur={(e) => saveRadiusChange(Number(e.currentTarget.value))}
+                  className="radius-slider"
+                  aria-busy={isSavingRadius}
+                />
+
+                <div className="radius-ticks" aria-hidden="true">
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <span key={index} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="slider-labels">
+                <span>5 NM</span>
+                <span>50 NM</span>
+              </div>
+            </div>
+
             <div className="location-grid">
               {locationPresets.map((option) => {
                 const isCurrent = selectedLocationId === option.id;
@@ -157,7 +224,7 @@ export default function App() {
           <button
             className="gear-button"
             type="button"
-            aria-label="Open location list"
+            aria-label="Open settings"
             onClick={() => setScreen("locations")}
           >
             ⚙
@@ -186,7 +253,7 @@ export default function App() {
         <button
           className="gear-button"
           type="button"
-          aria-label="Open location list"
+          aria-label="Open settings"
           onClick={() => setScreen("locations")}
         >
           ⚙

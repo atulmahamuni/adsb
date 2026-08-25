@@ -7,7 +7,7 @@ const PORT = 3000;
 const DEFAULT_LAT = 47.43779305941157;
 const DEFAULT_LON = -122.2944064159777;
 
-const RADIUS_NM = 5;
+let RADIUS_NM = 15;
 const REFRESH_INTERVAL_MS = 15000;
 
 
@@ -222,11 +222,25 @@ async function getNearbyAircraft(lat, lon) {
   const url =
     `https://api.adsb.lol/v2/point/${lat}/${lon}/${RADIUS_NM}`;
 
-  const response = await fetch(url);
+//   const response = await fetch(url);
+    const response = await fetch(url, {
+        method: "GET",
+
+        headers: {
+        "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) " +
+            "Chrome/131.0.0.0 Safari/537.36",
+
+        "Accept": "application/json",
+
+        "Accept-Language": "en-US,en;q=0.9",
+        },
+    });
 
   if (!response.ok) {
     throw new Error(
-      `ADSB.lol failed: HTTP ${response.status} ${response.statusText}`
+      `ADSB.lol failed: HTTP ${response.status} ${response.statusText} for ${url}`
     );
   }
 
@@ -717,6 +731,48 @@ app.post("/api/location/reset", async (req, res) => {
     aircraftCount:
       aircraft.length,
 
+  });
+
+});
+
+
+// ------------------------------------------------------------
+// Set detection radius
+// ------------------------------------------------------------
+
+app.post("/api/radius", async (req, res) => {
+
+  const radiusNmValue = Number(req.body.radiusNm);
+
+  if (
+    Number.isNaN(radiusNmValue) ||
+    radiusNmValue < 1 ||
+    radiusNmValue > 1000
+  ) {
+    return res.status(400).json({
+      error: "Invalid radius: must be between 1 and 1000 NM",
+      example: { radiusNm: 15 },
+    });
+  }
+
+  RADIUS_NM = radiusNmValue;
+
+  console.log(`Detection radius changed to ${RADIUS_NM} NM`);
+
+  try {
+    await refreshAircraft();
+  } catch (error) {
+    return res.status(502).json({
+      error: "Radius updated, but aircraft refresh failed",
+      radius: RADIUS_NM,
+      details: error.message,
+    });
+  }
+
+  res.json({
+    success: true,
+    radius: RADIUS_NM,
+    aircraftCount: aircraft.length,
   });
 
 });
